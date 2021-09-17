@@ -2,11 +2,25 @@ import React from 'react';
 import styled from 'styled-components';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import InfoIcon from '@material-ui/icons/Info';
-import {useSelector} from 'react-redux';
-import {selectRoomId} from '../features/appSlice';
 import ChatInput from './ChatInput';
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
+import { db } from '../firebase';
+import {selectRoomId} from '../features/appSlice';
+import {useSelector} from 'react-redux';
+
+
+
 function Chat() {
     const roomId = useSelector(selectRoomId)
+
+    const[roomDetails] = useDocument(
+        roomId && db.collection('rooms').doc(roomId)
+    )
+
+    const[roomMessages] = useCollection(
+        roomId && db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp', 'asc')
+    )
+    console.log(roomMessages);
 
     return (
         <ChatContainer>
@@ -14,7 +28,7 @@ function Chat() {
             <Header>
                 <HeaderLeft>
                     <h4>
-                        <strong>#Room-name</strong>
+                        <strong>{roomId ? `#${roomDetails?.data().name}` : "You have not joined a room yet" }</strong>
                     </h4>
                     <StarBorderIcon />
                 </HeaderLeft>
@@ -25,10 +39,14 @@ function Chat() {
                     </p>
                 </HeaderRight>
             </Header>
-            <ChatMessages>{/* List out the messages */}</ChatMessages>
+            <ChatMessages>
+                {roomMessages?.doc().map((doc) => {
+                    const { message, timestamp, user, userImage } = doc.data();
+                })}
+            </ChatMessages>
 
             <ChatInput
-                channelId ={roomId}
+                channelName = {roomDetails?.data().name}
             />
         </>
         </ChatContainer>

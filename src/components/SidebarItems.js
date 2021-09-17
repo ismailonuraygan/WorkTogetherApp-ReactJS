@@ -1,12 +1,11 @@
 import React from 'react'
 import styled from 'styled-components';
-import db from '../firebase';
-import { collection, addDoc } from "firebase/firestore/lite"; 
+import { db }  from '../firebase';
 import { useDispatch } from 'react-redux';
 import { enterRoom } from '../features/appSlice';
 
 
-function SidebarItems( { Icon, title, addChannelOption } ) {
+function SidebarItems( { Icon, title, addChannelOption, id } ) {
 
     const dispatch = useDispatch()
 
@@ -14,17 +13,14 @@ function SidebarItems( { Icon, title, addChannelOption } ) {
         const channelName = prompt('Please enter the channel name');
 
         if(channelName) {
-            (async (db) => {
-                const docRef = await addDoc(collection(db, "rooms"), {
-                    name: channelName
-                  });
-                  console.log(docRef)
-            
-            }) (db)
+            db.collection('rooms').add({
+                name: channelName,
+            })
         }
     };
     
-    const selectChannel = (id) => {
+    const selectChannel = () => {
+    
         if (id) {
             dispatch(enterRoom({
                 roomId: id
