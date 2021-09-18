@@ -1,54 +1,76 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import InfoIcon from '@material-ui/icons/Info';
 import ChatInput from './ChatInput';
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { db } from '../firebase';
-import {selectRoomId} from '../features/appSlice';
-import {useSelector} from 'react-redux';
-
+import { selectRoomId } from '../features/appSlice';
+import { useSelector } from 'react-redux';
+import Message from './Message';
 
 
 function Chat() {
+
+    const chatRef = useRef(null)
+    console.log(chatRef)
     const roomId = useSelector(selectRoomId)
 
-    const[roomDetails] = useDocument(
+    const [roomDetails] = useDocument(
         roomId && db.collection('rooms').doc(roomId)
-    )
+    ) //firebase hook
 
-    const[roomMessages] = useCollection(
+    const [roomMessages, loading] = useCollection(
         roomId && db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp', 'asc')
-    )
-    console.log(roomMessages);
+    ) //firebase hook
+
+
+    useEffect(() => {
+        chatRef?.current?.scrollIntoView({ behavior: "smooth" });
+    }, [roomId, loading])
 
     return (
         <ChatContainer>
-        <>
-            <Header>
-                <HeaderLeft>
-                    <h4>
-                        <strong>{roomId ? `#${roomDetails?.data().name}` : "You have not joined a room yet" }</strong>
-                    </h4>
-                    <StarBorderIcon />
-                </HeaderLeft>
+            {roomDetails && roomMessages && (
 
-                <HeaderRight>
-                    <p>
-                        <InfoIcon /> Details
-                    </p>
-                </HeaderRight>
-            </Header>
-            <ChatMessages>
-                {roomMessages?.doc().map((doc) => {
-                    const { message, timestamp, user, userImage } = doc.data();
-                })}
-            </ChatMessages>
+                <>
+                    <Header>
+                        <HeaderLeft>
+                            <h4>
+                                <strong>{roomId ? `#${roomDetails?.data().name}` : "You have not joined a room yet"}</strong>
+                            </h4>
+                            <StarBorderIcon />
+                        </HeaderLeft>
 
-            <ChatInput
-                channelName = {roomDetails?.data().name}
-            />
-        </>
+                        <HeaderRight>
+                            <p>
+                                <InfoIcon /> Details
+                            </p>
+                        </HeaderRight>
+                    </Header>
+                    <ChatMessages>
+                        {roomMessages?.docs.map((doc) => {
+                            const { message, timestamp, user, userImage } = doc.data();
+
+                            return (
+                                <Message
+                                    key={doc.id}
+                                    message={message}
+                                    timestamp={timestamp}
+                                    user={user}
+                                    userImage={userImage}
+                                />
+                            )
+                        })}
+                        <ChatBottom ref={chatRef} />
+                    </ChatMessages>
+
+                    <ChatInput
+                        chatRef={chatRef}
+                        channelName={roomDetails?.data().name}
+                    />
+                </>
+            )}
         </ChatContainer>
 
 
@@ -70,6 +92,7 @@ const Header = styled.div`
         justify-content: space-between;
         padding: 20px;
         border-bottom: 1px solid lightgray;
+        
     `
 
 const HeaderLeft = styled.div`
@@ -102,5 +125,9 @@ const HeaderRight = styled.div`
 `
 
 const ChatMessages = styled.div``
+
+const ChatBottom = styled.div`
+    padding-bottom: 200px;
+`
 
 

@@ -8,10 +8,9 @@ import {selectRoomId} from '../features/appSlice';
 
 
 
-function ChatInput({ channelName, channelId }) {
+function ChatInput({ channelName, channelId, chatRef }) {
 
     const roomId = useSelector(selectRoomId)
-    console.log(channelId)
 
     const [input, setInput] = useState('')
     const sendMessage = (e) => {
@@ -29,6 +28,10 @@ function ChatInput({ channelName, channelId }) {
     });
 
     setInput('');
+
+    chatRef?.current?.scrollIntoView(
+        {behavior: "smooth"}
+    );
     }
 
     return (
@@ -38,7 +41,7 @@ function ChatInput({ channelName, channelId }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value) }
                 placeholder={roomId ? `Message #${channelName}`: "Join channel to chat!"  } />
-                <Button  type="submit" onClick={sendMessage}>
+                <Button  type="submit" onClick={sendMessage}>    
                     Send
                 </Button>
             </form>
