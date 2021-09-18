@@ -5,10 +5,15 @@ import { db } from '../firebase';
 import firebase from 'firebase';
 import {useSelector} from 'react-redux';
 import {selectRoomId} from '../features/appSlice';
+import {auth} from '../firebase'
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+
 
 
 
 function ChatInput({ channelName, channelId, chatRef }) {
+    const [user] = useAuthState(auth);
 
     const roomId = useSelector(selectRoomId)
 
@@ -23,8 +28,8 @@ function ChatInput({ channelName, channelId, chatRef }) {
     db.collection("rooms").doc(roomId).collection("messages").add({
         message: input,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        user: 'Onur Aygan',
-        userImage: "https://pbs.twimg.com/media/Eed9AJ_XgAERe7O.png"
+        user: user.displayName,
+        userImage: user.photoURL
     });
 
     setInput('');

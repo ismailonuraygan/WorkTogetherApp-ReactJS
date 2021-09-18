@@ -32,7 +32,6 @@ function Chat() {
     return (
         <ChatContainer>
             {roomDetails && roomMessages && (
-
                 <>
                     <Header>
                         <HeaderLeft>
@@ -92,22 +91,25 @@ const Header = styled.div`
         justify-content: space-between;
         padding: 20px;
         border-bottom: 1px solid lightgray;
-        
+        z-index: 100;
+        background-color: white;
     `
 
 const HeaderLeft = styled.div`
     display: flex;
     align-items: center;
-    
+    color: black;
+
     >h4 {
         display: flex;
         text-transform: lowercase;
-        margin-right: 10px;
+        padding-right: 10px;        
     }
 
     > .MuiSvgIcon-root	 {
         margin-left: 10px;
         font-size: 18px;
+       
     }
 `
 
@@ -116,6 +118,8 @@ const HeaderRight = styled.div`
         display: flex;
         align-items: center;
         font-size: 14px;
+        color: black;
+        margin-right: 20px;
     }
 
     > p > .MuiSvgIcon-root {
