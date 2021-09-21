@@ -91,7 +91,6 @@ const Header = styled.div`
         justify-content: space-between;
         padding: 20px;
         border-bottom: 1px solid lightgray;
-        z-index: 100;
         background-color: white;
     `
 
